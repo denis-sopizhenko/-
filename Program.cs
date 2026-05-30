@@ -4,20 +4,61 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // Обов'язкова інформація про студента
         Console.WriteLine("Student: Sopizhenko Denys Leonidovych, IPZ, 11 group 2");
         Console.WriteLine("Task Variant: Modeling the operation processes of a smart car");
-        Console.WriteLine("Version 3 (Predicate Functions & Dynamic Ride Simulation)");
+        Console.WriteLine("Version 4 (Operator Overloading & Priority 2 Tasks)");
         Console.WriteLine("Simulation started...\n");
 
-        // ДЕМОНСТРАЦІЯ З ВЕРСІЇ 2 (Технічний протокол конструкторів)
-        Console.WriteLine("=== [STAGE 1: SYSTEM DIAGNOSTICS & COPIES] ===");
-        SmartCar techCar = new SmartCar();
-        SmartCar clonedCar = new SmartCar(techCar); 
+        // ==================================================================
+        // ЧАСТИНА 1: ПРОТОКОЛ ПЕРЕВАНТАЖЕННЯ ОПЕРАТОРІВ (Застосування на практиці)
+        // ==================================================================
+        Console.WriteLine("=== [STAGE 1: OPERATOR OVERLOADING PROTOCOL] ===");
+
+        // 1. Бінарний оператор '+' (Об'єднання маршрутів)
+        Route routeHomeToShop = new Route("Home", "Supermarket", 5);
+        Route routeShopToUni = new Route("Supermarket", "University", 10);
+        Route combinedRoute = routeHomeToShop + routeShopToUni; // Застосування +
+        Console.WriteLine($"[Operator +] Combined Route Distance: {combinedRoute.DistanceKm} km ({combinedRoute.StartPoint} -> {combinedRoute.Destination})");
+
+        // 2. Унарні оператори '++', '--' та '!' для Engine
+        Engine testEngine = new Engine();
+        testEngine.Start();
+        testEngine++; // Збільшення швидкості через ++
+        testEngine++; 
+        Console.WriteLine($"[Operator ++] Engine speed after double increment: {testEngine.CurrentSpeed} km/h");
+        testEngine--; // Зменшення через --
+        Console.WriteLine($"[Operator --] Engine speed after decrement: {testEngine.CurrentSpeed} km/h");
+
+        if (!testEngine) // Застосування оператора !
+        {
+            Console.WriteLine("[Operator !] Engine is NOT running.");
+        }
+        else
+        {
+            Console.WriteLine("[Operator !] Engine IS currently running.");
+        }
+
+        // 3. Оператори true / false
+        if (testEngine) // Використання об'єкта як булевого виразу завдяки операторам true/false
+        {
+            Console.WriteLine("[Operator true/false] Condition evaluated to TRUE: Engine is online and safe.");
+        }
+
+        // 4. Оператори порівняння '==', '!=', '<', '>'
+        SmartCar car1 = new SmartCar();
+        SmartCar car2 = new SmartCar();
+        car1.CarEngine.SetSpeed(80);
+        car2.CarEngine.SetSpeed(50);
+
+        Console.WriteLine($"[Operator >] Is Car 1 faster than Car 2? -> {car1 > car2}");
+        Console.WriteLine($"[Operator ==] Are Car 1 and Car 2 driving at the same speed? -> {car1 == car2}");
+
         Console.WriteLine("=== [STAGE 1 COMPLETED] ===\n");
 
-        // ІНТЕРФЕЙС ВВЕДЕННЯ З ВЕРСІЇ 2 + НОВІ ФУНКЦІЇ ВЕРСІЇ 3
-        Console.WriteLine("=== [STAGE 2: INTERACTIVE INITIALIZATION] ===");
+        // ==================================================================
+        // ЧАСТИНА 2: ІНТЕРАКТИВНА СИМУЛЯЦІЯ (Збережений та розширений функціонал)
+        // ==================================================================
+        Console.WriteLine("=== [STAGE 2: INTERACTIVE SIMULATION WITH OPERATORS] ===");
         SmartCar myCar = new SmartCar();
 
         Console.Write("Enter passenger name: ");
@@ -26,86 +67,52 @@ public class Program
 
         Console.Write($"Does {userPassenger.Name} want to fasten the seatbelt? (yes/no): ");
         string seatbeltChoice = Console.ReadLine().Trim().ToLower();
-        if (seatbeltChoice == "yes" || seatbeltChoice == "y")
-        {
-            userPassenger.ToggleSeatbelt();
-        }
+        if (seatbeltChoice == "yes" || seatbeltChoice == "y") userPassenger.ToggleSeatbelt();
         myCar.BoardPassenger(userPassenger);
 
-        Console.Write("\nEnter destination point: ");
-        string destination = Console.ReadLine();
-        
-        Console.Write("Enter route distance (in km): ");
-        int distance;
-        while (!int.TryParse(Console.ReadLine(), out distance) || distance <= 0)
+        // Використовуємо об'єднаний раніше маршрут для поїздки
+        myCar.Drive(combinedRoute);
+
+        if (myCar.CarEngine) // Використання оператора true для перевірки працездатності системи
         {
-            Console.Write("Invalid input. Enter positive number: ");
-        }
-        Route userRoute = new Route("Current Location", destination, distance);
-
-        // ВЕРСІЯ 3: Визначення станів об'єктів через ПРЕДИКАТНІ ФУНКЦІЇ перед стартом
-        Console.WriteLine("\n=== [STAGE 3: PRE-DRIVE PREDICATE CHECKS] ===");
-        Console.WriteLine($"[Predicate] Is passenger safe? -> {userPassenger.IsSafe()}");
-        Console.WriteLine($"[Predicate] Is route long-distance (over 100km)? -> {userRoute.IsLongDistance()}");
-        Console.WriteLine($"[Predicate] Is engine system healthy? -> {myCar.CarEngine.IsSystemHealthy()}");
-
-        // Спроба розпочати рух
-        myCar.Drive(userRoute);
-
-        // Якщо автомобіль пройшов перевірки безпеки і завівся — починається симуляція поїздки
-        if (myCar.CarEngine.IsRunning)
-        {
-            Console.WriteLine("\n=== [STAGE 4: DYNAMIC RIDE SIMULATION (NEW)] ===");
-            Console.WriteLine("The car has started moving. You can now control it during the trip.");
-            
             bool tripActive = true;
             while (tripActive)
             {
-                Console.WriteLine("\n--- Control Panel ---");
-                Console.WriteLine("1. Adjust Cruise Speed");
-                Console.WriteLine("2. Check Sensors & Road Surroundings");
-                Console.WriteLine("3. View Car Diagnostics (Predicate States)");
+                Console.WriteLine("\n--- Control Panel (Enhanced with Operators) ---");
+                Console.WriteLine("1. Speed UP (Operator ++)");
+                Console.WriteLine("2. Speed DOWN (Operator --)");
+                Console.WriteLine("3. Simulate Obstacle (Sensors & Auto-Brake)");
                 Console.WriteLine("4. Drive 10 km forward");
-                Console.WriteLine("5. Finish Trip / Emergency Stop");
+                Console.WriteLine("5. Finish Trip");
                 Console.Write("Select action (1-5): ");
                 
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
                     case "1":
-                        Console.Write("Enter new speed (km/h): ");
-                        if (int.TryParse(Console.ReadLine(), out int speed) && speed >= 0)
-                            myCar.AdjustSpeed(speed);
-                        else
-                            Console.WriteLine("Invalid speed.");
+                        myCar.AccelerateWithIncrement(); // Виклик логіки ++ всередині класу
                         break;
                     case "2":
-                        // Перевірка сенсорів на перешкоди + зміна дистанції в реальному часі
-                        Console.Write("Simulate distance to obstacle ahead (meters): ");
-                        if (int.TryParse(Console.ReadLine(), out int obsDist) && obsDist >= 0)
+                        myCar.DecelerateWithDecrement(); // Виклик логіки -- всередині класу
+                        break;
+                    case "3":
+                        Console.Write("Enter distance to obstacle (meters): ");
+                        if (int.TryParse(Console.ReadLine(), out int obsDist))
                         {
                             myCar.CarSensors.UpdateObstacleDistance(obsDist);
                             myCar.CheckSurroundings();
                         }
                         break;
-                    case "3":
-                        // Демонстрація предикатів стану автомобіля у реальному часі
-                        Console.WriteLine($"-> [Predicate] Is Car Moving?: {myCar.IsMoving()}");
-                        Console.WriteLine($"-> [Predicate] Has Engine Overheated?: {myCar.CarEngine.IsOverheated()}");
-                        Console.WriteLine($"-> [Predicate] Is Sensor Array Clear?: {myCar.CarSensors.IsPathClear()}");
-                        break;
                     case "4":
-                        // Логіка просування по маршруту
                         myCar.SimulateDistanceTraveled(10);
-                        if (myCar.DistanceTraveled >= userRoute.DistanceKm)
+                        if (myCar.DistanceTraveled >= combinedRoute.DistanceKm)
                         {
-                            Console.WriteLine($"\n[Arrived] Successfully reached {userRoute.Destination}!");
+                            Console.WriteLine($"\n[Arrived] Destination reached!");
                             myCar.CarEngine.Stop();
                             tripActive = false;
                         }
                         break;
                     case "5":
-                        Console.WriteLine("[Control] Stopping simulation...");
                         myCar.CarEngine.Stop();
                         tripActive = false;
                         break;
@@ -115,11 +122,6 @@ public class Program
                 }
             }
         }
-
-        // Фінальний вивід атрибутів з Версії 2
-        Console.WriteLine("\n=== FINAL ATTRIBUTE PROTOCOL ===");
-        Console.WriteLine($"[Car] Speed: {myCar.CarEngine.CurrentSpeed} km/h | Traveled: {myCar.DistanceTraveled}/{userRoute.DistanceKm} km");
-        Console.WriteLine($"[Passenger] Name: {userPassenger.Name} | Secured: {userPassenger.IsSeatbeltFastened}");
 
         Console.WriteLine("\nSimulation finished.");
         Console.ReadLine();
