@@ -1,18 +1,19 @@
 using System;
 
-public class SensorArray
+// Успадковує базовий клас Person
+public class Passenger : Person
 {
-    private int _simulatedDistance;
-    public SensorArray() => _simulatedDistance = 150;
-    public void UpdateObstacleDistance(int meters) => _simulatedDistance = meters;
-    public int GetObstacleDistance() => _simulatedDistance;
-    public bool IsPathClear() => _simulatedDistance >= 15;
+    public bool IsSeatbeltFastened { get; private set; }
 
-    // ВЕРСІЯ 4: Унарний оператор '-' (Примусове зменшення безпечної дистанції)
-    public static SensorArray operator -(SensorArray s)
+    // Конструктор похідного класу, що викликає конструктор базового через 'base'
+    public Passenger(string name) : base(name)
     {
-        // Імітує сильне зашумлення чи збій (зменшує дистанцію фіксації вдвічі)
-        s._simulatedDistance /= 2;
-        return s;
+        IsSeatbeltFastened = false;
+        Console.WriteLine($"[Derived Passenger Constructor] Passenger role attached to {Name}.");
     }
+
+    public void ToggleSeatbelt() => IsSeatbeltFastened = !IsSeatbeltFastened;
+    public bool IsSafe() => IsSeatbeltFastened;
+
+    public static bool operator !(Passenger p) => !p.IsSeatbeltFastened;
 }
