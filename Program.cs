@@ -6,41 +6,12 @@ public class Program
     {
         Console.WriteLine("Student: Sopizhenko Denys Leonidovych, IPZ, 11 group 2");
         Console.WriteLine("Task Variant: Modeling the operation processes of a smart car");
-        Console.WriteLine("Version 5 (Inheritance, Abstract Classes & Interfaces)");
+        Console.WriteLine("Version 6 (Robust Exception Handling Ecosystem)");
         Console.WriteLine("Simulation started...\n");
 
-        // ==================================================================
-        // ЧАСТИНА 1: ДЕМОНСТРАЦІЯ УСПАДКУВАННЯ ТА ПОЛІМОРФІЗМУ (STAGE 1)
-        // ==================================================================
-        Console.WriteLine("=== [STAGE 1: OOP INHERITANCE & INTERFACES DEMO] ===");
+        SmartCar myCar = new SmartCar();
 
-        // Використання поліморфізму: Абстрактний клас посилається на похідний
-        Vehicle myRoboVehicle = new SmartCar();
-        myRoboVehicle.StartVehicle(); // Виклик перевизначеного (override) методу
-
-        // Використання інтерфейсів
-        IDiagnosable diagnosticUnit = (IDiagnosable)myRoboVehicle;
-        diagnosticUnit.PrintDiagnosticReport(); // Звіт через інтерфейс
-
-        // Демонстрація базового класу Person та похідного Passenger
-        Person plainPerson = new Person("Generic Citizen");
-        Passenger vipPassenger = new Passenger("Denis Sopizhenko");
-        Console.WriteLine($"[Inheritance] Person Name: {plainPerson.Name}");
-        Console.WriteLine($"[Inheritance] Passenger Name (inherited): {vipPassenger.Name}");
-
-        // Оператор '+' з Версії 4 (збережено)
-        Route r1 = new Route("Home", "Hub", 4);
-        Route r2 = new Route("Hub", "University", 11);
-        Route finalRoute = r1 + r2;
-
-        Console.WriteLine("=== [STAGE 1 COMPLETED] ===\n");
-
-        // ==================================================================
-        // ЧАСТИНА 2: ІНТЕРАКТИВНА СИМУЛЯЦІЯ (Збережений та розширений функціонал)
-        // ==================================================================
-        Console.WriteLine("=== [STAGE 2: INTERACTIVE SIMULATION (VERSION 5)] ===");
-        SmartCar interactiveCar = new SmartCar();
-
+        // 1. Інтерактивне введення (Збережено з попередніх версій)
         Console.Write("Enter passenger name: ");
         string passengerName = Console.ReadLine();
         Passenger userPassenger = new Passenger(passengerName);
@@ -49,73 +20,116 @@ public class Program
         string seatbeltChoice = Console.ReadLine().Trim().ToLower();
         if (seatbeltChoice == "yes" || seatbeltChoice == "y") userPassenger.ToggleSeatbelt();
         
-        interactiveCar.BoardPassenger(userPassenger);
-        
-        // Виклик методу інтерфейсу IAutopilot
-        interactiveCar.Navigate(finalRoute);
+        myCar.BoardPassenger(userPassenger);
 
-        if (interactiveCar.CarEngine)
+        Route tripRoute = new Route("Kyiv Office", "Tech Park", 60);
+
+        // ==================================================================
+        // ВЕРСІЯ 6: ТЕСТ КРИТИЧНОЇ СИТУАЦІЇ 1 (Спроба старту руху під try-catch)
+        // ==================================================================
+        Console.WriteLine("\n=== [CRITICAL SCENARIO 1: STARTUP CHECK] ===");
+        try
         {
-            bool simulationActive = true;
-            while (simulationActive)
+            myCar.Drive(tripRoute);
+            Console.WriteLine("[System Status] Startup successful. No exceptions thrown.");
+        }
+        catch (UnsecuredPassengerException ex)
+        {
+            Console.WriteLine($"[CATCH] Intercepted Custom Exception: {ex.Message}");
+            Console.WriteLine($"[Action] SmartCar automatically engaged cabin protection locks for: {ex.PassengerName}");
+            
+            // Захисна дія: Примусово пристібаємо пасажира та пробуємо ще раз
+            Console.WriteLine("[Fixing...] Autopilot is forcing seatbelt compliance...");
+            userPassenger.ToggleSeatbelt();
+            myCar.Drive(tripRoute); // Повторний безпечний старт
+        }
+
+        // ==================================================================
+        // ТЕСТ КРИТИЧНОЇ СИТУАЦІЇ 2 (Ігровий цикл з обробкою відхилень та помилок)
+        // ==================================================================
+        if (myCar.CarEngine.IsRunning)
+        {
+            bool liveSession = true;
+            while (liveSession)
             {
-                Console.WriteLine("\n--- Control Panel (V5: Inheritance & Interfaces) ---");
-                Console.WriteLine("1. Speed UP (Cruising ++)");
-                Console.WriteLine("2. Speed DOWN (Cruising --)");
-                Console.WriteLine("3. Check Sensors & Distance");
-                Console.WriteLine("4. Drive 10 km forward");
-                Console.WriteLine("5. Print Interface Diagnostic Report (IDiagnosable)");
-                Console.WriteLine("6. Exit Simulation");
-                Console.Write("Select action (1-6): ");
+                Console.WriteLine("\n--- Smart Car Operating Console (V6 Fault-Tolerant) ---");
+                Console.WriteLine("1. Accelerate Cruising Speed");
+                Console.WriteLine("2. Calculate Time to Destination (Risk: Divide by Zero)");
+                Console.WriteLine("3. Simulate High-Speed Overheat Test (Risk: Custom App Crash)");
+                Console.WriteLine("4. Test Array Index Out of Bounds (Risk: Standard .NET Crash)");
+                Console.WriteLine("5. Finish Trip Successfully");
+                Console.Write("Choose operation (1-5): ");
 
-                string choice = Console.ReadLine();
-                switch (choice)
+                try
                 {
-                    case "1":
-                        interactiveCar.AccelerateWithIncrement();
-                        break;
-                    case "2":
-                        interactiveCar.DecelerateWithDecrement();
-                        break;
-                    case "3":
-                        Console.Write("Enter obstacle distance (meters): ");
-                        if (int.TryParse(Console.ReadLine(), out int obsDist))
-                        {
-                            interactiveCar.CarSensors.UpdateObstacleDistance(obsDist);
-                            interactiveCar.CheckSurroundings();
-                        }
-                        break;
-                    case "4":
-                        interactiveCar.SimulateDistanceTraveled(10);
-                        // Робота з новим типом двигуна ElectricEngine
-                        if (interactiveCar.CarEngine is ElectricEngine electric)
-                        {
-                            Console.WriteLine($"[Battery Status] Eco-Engine charge: {electric.BatteryLevel}%");
-                        }
+                    string action = Console.ReadLine();
+                    switch (action)
+                    {
+                        case "1":
+                            myCar.AccelerateWithIncrement();
+                            break;
 
-                        if (interactiveCar.DistanceTraveled >= finalRoute.DistanceKm)
-                        {
-                            Console.WriteLine("\n[Arrived] Destination successfully reached by autopilot!");
-                            interactiveCar.CarEngine.Stop();
-                            simulationActive = false;
-                        }
-                        break;
-                    case "5":
-                        // Інтерфейсний виклик звіту
-                        interactiveCar.PrintDiagnosticReport();
-                        break;
-                    case "6":
-                        interactiveCar.CarEngine.Stop();
-                        simulationActive = false;
-                        break;
-                    default:
-                        Console.WriteLine("Unknown command.");
-                        break;
+                        case "2":
+                            // Демонстрація стандартного DivideByZeroException
+                            Console.WriteLine("[Calculation] Processing estimated time array...");
+                            int eta = myCar.CalculateTimeToDestination();
+                            Console.WriteLine($"[Result] Estimated arrival time: {eta} hours.");
+                            break;
+
+                        case "3":
+                            // Провокування користувацького винятку перегріву двигуна
+                            Console.WriteLine("[Warning] Simulating extreme overload on the motor...");
+                            myCar.AdjustSpeed(250); // Швидкість 250 викликає перегрів > 110°C
+                            break;
+
+                        case "4":
+                            // Демонстрація стандартного IndexOutOfRangeException
+                            Console.WriteLine("[Array Test] Attempting to access unregistered backup camera sensor...");
+                            int[] fakeSensorArray = { 1, 2, 3 };
+                            int brokenRead = fakeSensorArray[99]; // Спроба зчитування 99-го елемента
+                            break;
+
+                        case "5":
+                            liveSession = false;
+                            break;
+
+                        default:
+                            // Демонстрація FormatException при некоректному командному виборі
+                            throw new FormatException("Console routing parser failed: input string matches no system command indices.");
+                    }
+                }
+                // ОБРОБКА СТАНДАРТНИХ ВИНЯТКІВ .NET
+                catch (DivideByZeroException)
+                {
+                    Console.WriteLine("[CATCH: DivideByZero] ERROR: Car is stationary (Speed = 0). Cannot divide distance by zero speed!");
+                    Console.WriteLine("[Action] Resetting calculation module. Please increase speed first.");
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    Console.WriteLine($"[CATCH: IndexOutOfBounds] SYSTEM ERROR: Hardware array overflow. {ex.Message}");
+                    Console.WriteLine("[Action] Disconnecting corrupted sensor slot. Falling back to radar diagnostics.");
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine($"[CATCH: FormatException] Data parsing error. Details: {ex.Message}");
+                }
+                // ОБРОБКА КОРИСТУВАЦЬКОГО ВИНЯТКУ ПЕРЕГРІВУ
+                catch (EngineOverheatException ex)
+                {
+                    Console.WriteLine($"[CATCH: Custom Overheat] APPARATUS EMERGENCY: {ex.Message}");
+                    Console.WriteLine($"[Action] Current Core Temperature is dangerously high: {ex.CurrentTemperature}°C.");
+                    Console.WriteLine("[Action] Deploying automatic coolant fluid. Shutting down system loop.");
+                    liveSession = false; // Вихід з циклу через поломку
+                }
+                // ГАРАНТОВАНИЙ БЛОК FINALLY
+                finally
+                {
+                    Console.WriteLine("[Finally Block] Board network sanity routine completed. Keeping logs synced.");
                 }
             }
         }
 
-        Console.WriteLine("\nSimulation finished.");
+        Console.WriteLine("\nSimulation finished safely under exception monitoring.");
         Console.ReadLine();
     }
 }
