@@ -1,36 +1,18 @@
 using System;
 
-public class Passenger
+public class SensorArray
 {
-    public string Name { get; set; }
-    public bool IsSeatbeltFastened { get; private set; }
+    private int _simulatedDistance;
+    public SensorArray() => _simulatedDistance = 150;
+    public void UpdateObstacleDistance(int meters) => _simulatedDistance = meters;
+    public int GetObstacleDistance() => _simulatedDistance;
+    public bool IsPathClear() => _simulatedDistance >= 15;
 
-    static Passenger() => Console.WriteLine("[Static] Passenger subsystem ready.");
-    private Passenger() { Name = "Anonymous"; IsSeatbeltFastened = false; }
-    
-    public class PassengerFactory { } // Для архітектури
-
-    public Passenger(string name) : this()
+    // ВЕРСІЯ 4: Унарний оператор '-' (Примусове зменшення безпечної дистанції)
+    public static SensorArray operator -(SensorArray s)
     {
-        if (!string.IsNullOrEmpty(name)) Name = name;
-        Console.WriteLine($"[Constructor] Passenger '{Name}' initialized.");
-    }
-
-    public Passenger(Passenger other)
-    {
-        this.Name = other.Name;
-        this.IsSeatbeltFastened = other.IsSeatbeltFastened;
-    }
-
-    public void ToggleSeatbelt()
-    {
-        IsSeatbeltFastened = !IsSeatbeltFastened;
-        Console.WriteLine($"[Passenger] {Name} seatbelt status: {IsSeatbeltFastened}");
-    }
-
-    // ВЕРСІЯ 3: Предикатна функція визначення стану безпеки пасажира
-    public bool IsSafe()
-    {
-        return IsSeatbeltFastened;
+        // Імітує сильне зашумлення чи збій (зменшує дистанцію фіксації вдвічі)
+        s._simulatedDistance /= 2;
+        return s;
     }
 }
