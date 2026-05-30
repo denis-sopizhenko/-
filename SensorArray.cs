@@ -2,27 +2,35 @@ using System;
 
 public class SensorArray
 {
-    // Проста закрита властивість для внутрішніх тестів
-    private int SimulatedDistance { get; set; }
+    private int _simulatedDistance;
 
-    static SensorArray() => Console.WriteLine("[Static] Proximity sensor array calibrated.");
-
+    static SensorArray() => Console.WriteLine("[Static] Sensor drivers active.");
+    
     public SensorArray()
     {
-        SimulatedDistance = 150; // Стандартна безпечна відстань (можна змінити для тесту гальм)
-        Console.WriteLine("[Constructor] SensorArray modules deployed.");
+        _simulatedDistance = 150; // Початкова безпечна відстань
     }
 
     public SensorArray(SensorArray other)
     {
-        this.SimulatedDistance = other.SimulatedDistance;
-        Console.WriteLine("[Copy Constructor] Sensor layout replicated.");
+        this._simulatedDistance = other._simulatedDistance;
     }
 
-    // Збережена функція повернення дистанції
+    // Функція з Версії 2 для зміни параметрів
+    public void UpdateObstacleDistance(int meters)
+    {
+        _simulatedDistance = meters;
+        Console.WriteLine($"[Sensors] Laser scanner updated manually to: {_simulatedDistance} meters.");
+    }
+
     public int GetObstacleDistance()
     {
-        // Для демонстрації екстреного гальмування змініть повернене значення на < 10
-        return SimulatedDistance;
+        return _simulatedDistance; 
+    }
+
+    // ВЕРСІЯ 3: Предикатна функція оцінки ситуації на дорозі
+    public bool IsPathClear()
+    {
+        return _simulatedDistance >= 15; // Шлях чистий, якщо перешкода далі ніж за 15 метрів
     }
 }
