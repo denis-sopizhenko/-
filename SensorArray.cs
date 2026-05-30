@@ -4,33 +4,27 @@ public class SensorArray
 {
     private int _simulatedDistance;
 
-    static SensorArray() => Console.WriteLine("[Static] Sensor drivers active.");
-    
+    // Конструктор без параметрів (збережений з попередніх версій)
     public SensorArray()
     {
-        _simulatedDistance = 150; // Початкова безпечна відстань
+        _simulatedDistance = 150;
     }
 
+    // ВІДПОВІДЬ НА ПОМИЛКУ: Додано конструктор копії, який очікував SmartCar
     public SensorArray(SensorArray other)
     {
         this._simulatedDistance = other._simulatedDistance;
     }
 
-    // Функція з Версії 2 для зміни параметрів
-    public void UpdateObstacleDistance(int meters)
-    {
-        _simulatedDistance = meters;
-        Console.WriteLine($"[Sensors] Laser scanner updated manually to: {_simulatedDistance} meters.");
-    }
+    // Збережені функції керування дистанцією
+    public void UpdateObstacleDistance(int meters) => _simulatedDistance = meters;
+    public int GetObstacleDistance() => _simulatedDistance;
+    public bool IsPathClear() => _simulatedDistance >= 15;
 
-    public int GetObstacleDistance()
+    // ВЕРСІЯ 4: Унарний оператор '-' (імітація зашумлення)
+    public static SensorArray operator -(SensorArray s)
     {
-        return _simulatedDistance; 
-    }
-
-    // ВЕРСІЯ 3: Предикатна функція оцінки ситуації на дорозі
-    public bool IsPathClear()
-    {
-        return _simulatedDistance >= 15; // Шлях чистий, якщо перешкода далі ніж за 15 метрів
+        s._simulatedDistance /= 2;
+        return s;
     }
 }
