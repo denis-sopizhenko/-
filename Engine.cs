@@ -4,59 +4,52 @@ public class Engine
 {
     public bool IsRunning { get; private set; }
     public int CurrentSpeed { get; set; }
-    public int Temperature { get; private set; } // Новий змінюваний атрибут стану
+    public int Temperature { get; private set; }
 
-    static Engine() => Console.WriteLine("[Static] Engine ECU firmware loaded.");
+    public Engine() { IsRunning = false; CurrentSpeed = 0; Temperature = 20; }
+    public Engine(Engine other) { this.IsRunning = other.IsRunning; this.CurrentSpeed = other.CurrentSpeed; this.Temperature = other.Temperature; }
 
-    public Engine()
+    public void Start() { IsRunning = true; Temperature = 90; }
+    public void SetSpeed(int speed) { if (IsRunning) { CurrentSpeed = speed; Temperature = 90 + (speed / 5); } }
+    public void Stop() { IsRunning = false; CurrentSpeed = 0; Temperature = 40; }
+    public bool IsSystemHealthy() => Temperature < 115;
+    public bool IsOverheated() => Temperature >= 110;
+
+    // ВЕРСІЯ 4: Перевантаження унарних операторів '++' та '--'
+    public static Engine operator ++(Engine e)
     {
-        IsRunning = false;
-        CurrentSpeed = 0;
-        Temperature = 20; // Кімнатна температура при старті
-    }
-
-    public Engine(Engine other)
-    {
-        this.IsRunning = other.IsRunning;
-        this.CurrentSpeed = other.CurrentSpeed;
-        this.Temperature = other.Temperature;
-    }
-
-    public void Start()
-    {
-        IsRunning = true;
-        Temperature = 90; // Робоча температура двигуна
-        Console.WriteLine("[Engine] Ignition ON. Temperature stable at 90°C.");
-    }
-
-    public void SetSpeed(int speed)
-    {
-        if (IsRunning)
+        if (e.IsRunning)
         {
-            CurrentSpeed = speed;
-            // Швидкість збільшує нагрів двигуна
-            Temperature = 90 + (speed / 5);
-            Console.WriteLine($"[Engine] Speed updated: {CurrentSpeed} km/h. Temperature: {Temperature}°C");
+            e.CurrentSpeed += 10; // Крок круїз-контролю +10 км/год
+            e.Temperature = 90 + (e.CurrentSpeed / 5);
         }
+        return e;
     }
 
-    public void Stop()
+    public static Engine operator --(Engine e)
     {
-        IsRunning = false;
-        CurrentSpeed = 0;
-        Temperature = 40;
-        Console.WriteLine("[Engine] Engine shut down.");
+        if (e.IsRunning && e.CurrentSpeed >= 10)
+        {
+            e.CurrentSpeed -= 10; // Крок круїз-контролю -10 км/год
+            e.Temperature = 90 + (e.CurrentSpeed / 5);
+        }
+        return e;
     }
 
-    // ВЕРСІЯ 3: Предикатні функції стану двигуна
-    public bool IsSystemHealthy()
+    // ВЕРСІЯ 4: Перевантаження унарного оператора '!'
+    public static bool operator !(Engine e)
     {
-        // Система справна, якщо немає перегріву та критичних помилок
-        return Temperature < 115;
+        return !e.IsRunning;
     }
 
-    public bool IsOverheated()
+    // ВЕРСІЯ 4: Перевантаження операторів true та false (для умовних виразів)
+    public static bool operator true(Engine e)
     {
-        return Temperature >= 110; // Перегрів при високих швидкостях
+        return e.IsRunning && e.IsSystemHealthy();
+    }
+
+    public static bool operator false(Engine e)
+    {
+        return !e.IsRunning || e.IsOverheated();
     }
 }
