@@ -1,39 +1,32 @@
-﻿using System;
+using System;
 
 public class Engine
 {
-    // Автоматичні властивості (Аксесори)
     public bool IsRunning { get; private set; }
     public int CurrentSpeed { get; set; }
+    public int Temperature { get; private set; } // Новий змінюваний атрибут стану
 
-    static Engine() => Console.WriteLine("[Static] Engine ECU firmware mapped.");
+    static Engine() => Console.WriteLine("[Static] Engine ECU firmware loaded.");
 
-    // Закритий конструктор
-    private Engine(bool state)
+    public Engine()
     {
-        IsRunning = state;
+        IsRunning = false;
         CurrentSpeed = 0;
+        Temperature = 20; // Кімнатна температура при старті
     }
 
-    // Конструктор без параметрів (Ланцюжок)
-    public Engine() : this(false)
-    {
-        Console.WriteLine("[Constructor] Default physical Engine built.");
-    }
-
-    // Конструктор копії
     public Engine(Engine other)
     {
         this.IsRunning = other.IsRunning;
         this.CurrentSpeed = other.CurrentSpeed;
-        Console.WriteLine("[Copy Constructor] Engine hardware blueprint cloned.");
+        this.Temperature = other.Temperature;
     }
 
-    // Збережені функції керування двигуном
     public void Start()
     {
         IsRunning = true;
-        Console.WriteLine("[Engine] System ON. Power plant is idling.");
+        Temperature = 90; // Робоча температура двигуна
+        Console.WriteLine("[Engine] Ignition ON. Temperature stable at 90°C.");
     }
 
     public void SetSpeed(int speed)
@@ -41,11 +34,29 @@ public class Engine
         if (IsRunning)
         {
             CurrentSpeed = speed;
-            Console.WriteLine($"[Engine] Speed altered. Current kinetic velocity: {CurrentSpeed} km/h.");
+            // Швидкість збільшує нагрів двигуна
+            Temperature = 90 + (speed / 5);
+            Console.WriteLine($"[Engine] Speed updated: {CurrentSpeed} km/h. Temperature: {Temperature}°C");
         }
-        else
-        {
-            Console.WriteLine("[Engine] ERROR: Ignition is OFF. Acceleration denied.");
-        }
+    }
+
+    public void Stop()
+    {
+        IsRunning = false;
+        CurrentSpeed = 0;
+        Temperature = 40;
+        Console.WriteLine("[Engine] Engine shut down.");
+    }
+
+    // ВЕРСІЯ 3: Предикатні функції стану двигуна
+    public bool IsSystemHealthy()
+    {
+        // Система справна, якщо немає перегріву та критичних помилок
+        return Temperature < 115;
+    }
+
+    public bool IsOverheated()
+    {
+        return Temperature >= 110; // Перегрів при високих швидкостях
     }
 }
