@@ -3,101 +3,108 @@ using System.Collections.Generic;
 
 public class SmartCar
 {
-    // Композиція (Внутрішнє створення об'єктів)
+    // Композиція
     private Engine _engine;
     private SensorArray _sensors;
-
-    // Агрегація (Зовнішні об'єкти)
+    // Агрегація
     private List<Passenger> _passengers;
-
-    // Асоціація (Використання об'єкта)
+    // Асоціація
     private Route _activeRoute;
 
-    // Відкриті аксесори для перевірки стану з Main()
+    // Властивість для збереження пройденого шляху (Версія 3)
+    public int DistanceTraveled { get; private set; }
+
     public Engine CarEngine => _engine;
     public SensorArray CarSensors => _sensors;
 
-    static SmartCar() => Console.WriteLine("[Static] SmartCar Operating System loaded.");
+    static SmartCar() => Console.WriteLine("[Static] SmartCar Operating System booted.");
 
-    // Закритий конструктор
-    private SmartCar(Engine eng, SensorArray sens)
+    public SmartCar()
     {
-        _engine = eng;
-        _sensors = sens;
+        _engine = new Engine();
+        _sensors = new SensorArray();
         _passengers = new List<Passenger>();
+        DistanceTraveled = 0;
     }
 
-    // Конструктор без параметрів (Реалізує КОМПОЗИЦІЮ + Ланцюжок)
-    public SmartCar() : this(new Engine(), new SensorArray())
-    {
-        Console.WriteLine("[Constructor] SmartCar chassis fully assembled with new Core Components.");
-    }
-
-    // Конструктор копії (Глибоке копіювання компонентів композиції)
     public SmartCar(SmartCar other)
     {
         this._engine = new Engine(other._engine);
         this._sensors = new SensorArray(other._sensors);
-        this._passengers = new List<Passenger>(other._passengers); // Агреговані копіюються за посиланнями
-        Console.WriteLine("[Copy Constructor] SmartCar system architecture fully cloned.");
+        this._passengers = new List<Passenger>(other._passengers);
+        this.DistanceTraveled = other.DistanceTraveled;
     }
 
-    // Збережена функція Агрегації
     public void BoardPassenger(Passenger passenger)
     {
         _passengers.Add(passenger);
-        Console.WriteLine($"[SmartCar] Passenger '{passenger.Name}' successfully registered in cabin.");
+        Console.WriteLine($"[SmartCar] '{passenger.Name}' entered the smart cabin.");
     }
 
-    // Збережена функція контролю безпеки sebelum рухом
     private bool RunPreDriveSafetyCheck()
     {
-        Console.WriteLine("[SmartCar Safety] Running pre-flight cabin diagnostics...");
         foreach (var p in _passengers)
         {
-            if (!p.IsSeatbeltFastened)
+            // Використання предикату пасажира
+            if (!p.IsSafe()) 
             {
-                Console.WriteLine($"[SmartCar Safety] CRITICAL: Passenger '{p.Name}' has NOT fastened the seatbelt!");
+                Console.WriteLine($"[Safety Lock] ALERT: Passenger '{p.Name}' is unsafe!");
                 return false;
             }
         }
-        Console.WriteLine("[SmartCar Safety] Diagnostics PASSED. All parameters secure.");
         return true;
     }
 
-    // Збережена функція Асоціації руху
     public void Drive(Route route)
     {
         _activeRoute = route;
-        Console.WriteLine($"\n[SmartCar] Planning trip to '{_activeRoute.Destination}' ({_activeRoute.DistanceKm} km)...");
-
         if (RunPreDriveSafetyCheck())
         {
             _engine.Start();
-            Console.WriteLine("[SmartCar] Autopilot engaged. Starting cruise routine.");
+            Console.WriteLine($"[SmartCar] Mission started to {_activeRoute.Destination}.");
         }
         else
         {
-            Console.WriteLine("[SmartCar] INITIATION LOCKED. Engine start aborted due to safety violation.");
+            Console.WriteLine("[SmartCar] DRIVE BLOCKED. Pre-drive check failed.");
         }
     }
 
-    // Збережена функція зміни швидкості
     public void AdjustSpeed(int speed)
     {
         _engine.SetSpeed(speed);
     }
 
-    // Збережена функція аналізу сенсорів із системою захисту
     public void CheckSurroundings()
     {
-        int currentDistance = _sensors.GetObstacleDistance();
-        Console.WriteLine($"[Sensors] Nearest dynamic object tracked at: {currentDistance} meters.");
-
-        if (currentDistance < 10)
+        // Використання предикату сенсорів
+        if (!_sensors.IsPathClear())
         {
-            Console.WriteLine("[SmartCar Emergency] Collision risk detected! Engaging automatic braking...");
+            Console.WriteLine($"[SmartCar Auto-Brake] Proximity danger ({_sensors.GetObstacleDistance()}m)! Activating brakes...");
             _engine.SetSpeed(0);
         }
+        else
+        {
+            Console.WriteLine($"[SmartCar] Road state: CLEAR. Distance: {_sensors.GetObstacleDistance()}m.");
+        }
+    }
+
+    // Функція імітації прогресу їзди (Версія 3)
+    public void SimulateDistanceTraveled(int km)
+    {
+        if (_engine.IsRunning && _engine.CurrentSpeed > 0)
+        {
+            DistanceTraveled += km;
+            Console.WriteLine($"[Trip Progress] Drove +{km} km. Total traveled: {DistanceTraveled} km.");
+        }
+        else
+        {
+            Console.WriteLine("[Trip Progress] Car cannot move. Check speed or engine status.");
+        }
+    }
+
+    // ВЕРСІЯ 3: Предикатна функція загального стану руху авто
+    public bool IsMoving()
+    {
+        return _engine.IsRunning && _engine.CurrentSpeed > 0;
     }
 }
